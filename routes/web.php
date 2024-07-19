@@ -7,3 +7,8 @@ Route::get('/', function () {
     $tasks = Task::latest()->paginate(5);
     return view('home', compact('tasks'));
 });
+
+Route::get('/home', function (){
+    $tasks = Task::latest()->paginate(5);
+    return view('home', compact('tasks'));
+});

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\TaskResource;
 use App\Models\Task;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -10,17 +11,16 @@ use Illuminate\Support\Facades\Storage;
 class TaskController extends Controller
 {
     public function getTasks(){
-        $tasks = Task::latest()->get();;
-        return compact('tasks');
+        return TaskResource::collection(Task::paginate(5));
     }
 
     public function createTask(Request $request){
         $request->validate([
             'Deadline' => ['required', 'date_format:Y-m-d H:i:s'],
             'Title' => ['required'],
-            'Subject' => ['required'],
             'Image' => ['required', 'image'],
             'Description' => ['required'],
+            'SubjectId' => ['required'],
         ]);
 
         $fileName = Str::random(60) . '_'. str_replace(' ', '_', $request->file('Image')->getClientOriginalName());
@@ -29,9 +29,9 @@ class TaskController extends Controller
         Task::create([
             'Deadline' => $request->Deadline,
             'Title' => $request->Title,
-            'Subject' => $request->Subject,
             'Image' => $fileName,
-            'Description' => $request->Description
+            'Description' => $request->Description,
+            'SubjectId' => $request->SubjectId,
         ]);
 
         return "New task has been created!";
@@ -39,7 +39,7 @@ class TaskController extends Controller
 
     public function updateTask(Request $request, $id){
         $task = Task::find($id);
-        if(!$task) abort(400);
+        if(!$task) return response("Data not found", 404);
         
         $request->validate([
             'Deadline' => ['date_format:Y-m-d H:i:s'],
@@ -56,8 +56,8 @@ class TaskController extends Controller
         $task->update([
             'Deadline' => $request->input('Deadline', $task->Deadline),
             'Title' => $request->input('Title', $task->Title),
-            'Subject' => $request->input('Subject', $task->Subject),
-            'Description' => $request->input('Description', $task->Description)
+            'Description' => $request->input('Description', $task->Description),
+            'SubjectId' => $request->input('SubjectId', $task->SubjectId),
         ]);
 
         return "A task has been updated!";
@@ -65,7 +65,7 @@ class TaskController extends Controller
 
     public function deleteTask($id){
         $task = Task::find($id);
-        if(!$task) abort(400);
+        if(!$task) return response("Data not found", 404);
 
         if(Storage::exists('public/' . $task->Image)){
             Storage::delete('public/' . $task->Image);

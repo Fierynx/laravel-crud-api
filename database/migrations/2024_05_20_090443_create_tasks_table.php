@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('tasks', function (Blueprint $table) {
             $table->id('TaskId');
+            $table->foreignId('SubjectId')->references('SubjectId')->on('subjects')->onDelete('cascade')->onUpdate('cascade');
             $table->dateTime('Deadline');
             $table->string('Title');
-            $table->string('Subject');
             $table->text('Description');
             $table->string('Status')->default('Not Started');
             $table->string('Image');

@@ -28,7 +28,7 @@
             <td>{{ $task->TaskId }}</td>
             <td>{{ $task->Deadline }}</td>
             <td>{{ $task->Title }}</td>
-            <td>{{ $task->Subject }}</td>
+            <td>{{ $task->subject->Subject }}</td>
             <td>{{ $task->Description }}</td>
             <td><img width="200" height="200" src="/storage/{{ $task->Image }}" alt="Image Not Found"></td>
             </td>
